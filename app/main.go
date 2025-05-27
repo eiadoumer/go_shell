@@ -25,6 +25,7 @@ func main() {
 		command = strings.TrimSpace(command)
 		if command == " 0 exit" {
 			os.Exit(0)
+			break
 		}
 		// Skip empty input
 		if command == "" {
