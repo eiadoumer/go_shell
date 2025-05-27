@@ -23,7 +23,7 @@ func main() {
 
 		// Remove trailing newline character
 		command = strings.TrimSpace(command)
-		if command == " 0 exit" {
+		if command == "exit 0" {
 			os.Exit(0)
 			break
 		}
