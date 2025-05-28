@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -33,21 +34,27 @@ func main() {
 				output := strings.Join(parts[1:], " ")
 				fmt.Println(output)
 			} else {
-				fmt.Println(" ")
+				fmt.Println()
 			}
 			continue
 		}
 		if strings.HasPrefix(command, "type") {
 			parts := strings.Fields(command)
 			if len(parts) > 1 {
-				if parts[len(parts)-1] == "echo" || parts[len(parts)-1] == "exit" || parts[len(parts)-1] == "type" {
-					fmt.Printf("%s is a shell builtin\n", parts[len(parts)-1])
-
+				cmdName := parts[1] // Get the command name to search for
+				
+				// Check if it's a builtin first
+				if cmdName == "echo" || cmdName == "exit" || cmdName == "type" {
+					fmt.Printf("%s is a shell builtin\n", cmdName)
 				} else {
-					fmt.Printf("%s: not found\n", parts[len(parts)-1])
+					// Search in PATH
+					pathFound := findInPath(cmdName)
+					if pathFound != "" {
+						fmt.Printf("%s is %s\n", cmdName, pathFound)
+					} else {
+						fmt.Printf("%s: not found\n", cmdName)
+					}
 				}
-			} else {
-				fmt.Println(" ")
 			}
 			continue
 		}
@@ -59,4 +66,36 @@ func main() {
 		// Print command not found
 		fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
 	}
+}
+
+// findInPath searches for a command in the directories listed in PATH
+func findInPath(cmdName string) string {
+	// Get the PATH environment variable
+	pathEnv := os.Getenv("PATH")
+	if pathEnv == "" {
+		return ""
+	}
+
+	// Split PATH by colons to get individual directories
+	pathDirs := strings.Split(pathEnv, ":")
+
+	// Search each directory in order
+	for _, dir := range pathDirs {
+		if dir == "" {
+			continue
+		}
+		
+		// Create the full path to the potential executable
+		fullPath := filepath.Join(dir, cmdName)
+		
+		// Check if the file exists and is executable
+		if fileInfo, err := os.Stat(fullPath); err == nil {
+			// Check if it's a regular file and executable
+			if fileInfo.Mode().IsRegular() && (fileInfo.Mode().Perm()&0111) != 0 {
+				return fullPath
+			}
+		}
+	}
+	
+	return "" // Not found
 }
