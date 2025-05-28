@@ -13,6 +13,7 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
+
 		// Print the prompt
 		fmt.Fprint(os.Stdout, "$ ")
 
@@ -65,6 +66,16 @@ func main() {
 			continue
 		}
 
+		if command == "pwd" {
+			dir, err := pwd()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "pwd: %v\n", err)
+			} else {
+				fmt.Println(dir)
+			}
+			continue
+		}
+
 		// Try to execute as external program
 		parts := strings.Fields(command)
 		if len(parts) > 0 {
@@ -92,6 +103,7 @@ func main() {
 }
 
 // findInPath searches for a command in the directories listed in PATH
+
 func findInPath(cmdName string) string {
 	// Get the PATH environment variable
 	pathEnv := os.Getenv("PATH")
@@ -121,4 +133,12 @@ func findInPath(cmdName string) string {
 	}
 
 	return "" // Not found
+}
+
+func pwd() (string, error) {
+	working_dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	return working_dir, nil
 }
