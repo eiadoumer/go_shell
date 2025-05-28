@@ -27,6 +27,16 @@ func main() {
 			os.Exit(0)
 			break
 		}
+		if strings.HasPrefix(command, "echo") {
+			parts := strings.Fields(command)
+			if len(parts) > 1 {
+				output := strings.Join(parts[1:], " ")
+				fmt.Println(output)
+			} else {
+				fmt.Println(" ")
+			}
+			continue
+		}
 		// Skip empty input
 		if command == "" {
 			continue
