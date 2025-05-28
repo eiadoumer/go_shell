@@ -74,10 +74,8 @@ func main() {
 			// Find the command in PATH
 			cmdPath := findInPath(cmdName)
 			if cmdPath != "" {
-				// Execute the external program
-				// Create arguments array with command name as first argument
 				cmd := exec.Command(cmdPath, args...)
-				cmd.Args[0] = cmdName // Add this line
+				cmd.Args[0] = cmdName
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 
