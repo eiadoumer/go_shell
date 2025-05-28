@@ -42,7 +42,7 @@ func main() {
 			parts := strings.Fields(command)
 			if len(parts) > 1 {
 				cmdName := parts[1] // Get the command name to search for
-				
+
 				// Check if it's a builtin first
 				if cmdName == "echo" || cmdName == "exit" || cmdName == "type" {
 					fmt.Printf("%s is a shell builtin\n", cmdName)
@@ -77,17 +77,17 @@ func findInPath(cmdName string) string {
 	}
 
 	// Split PATH by colons to get individual directories
-	pathDirs := strings.Split(pathEnv, ":")
+	pathDirs := strings.SplitSeq(pathEnv, ":")
 
 	// Search each directory in order
-	for _, dir := range pathDirs {
+	for dir := range pathDirs {
 		if dir == "" {
 			continue
 		}
-		
+
 		// Create the full path to the potential executable
 		fullPath := filepath.Join(dir, cmdName)
-		
+
 		// Check if the file exists and is executable
 		if fileInfo, err := os.Stat(fullPath); err == nil {
 			// Check if it's a regular file and executable
@@ -96,6 +96,6 @@ func findInPath(cmdName string) string {
 			}
 		}
 	}
-	
+
 	return "" // Not found
 }
