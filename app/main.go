@@ -46,7 +46,7 @@ func main() {
 				cmdName := parts[1] // Get the command name to search for
 
 				// Check if it's a builtin first
-				if cmdName == "echo" || cmdName == "exit" || cmdName == "type" {
+				if cmdName == "echo" || cmdName == "exit" || cmdName == "type" || cmdName == "pwd" {
 					fmt.Printf("%s is a shell builtin\n", cmdName)
 				} else {
 					// Search in PATH
