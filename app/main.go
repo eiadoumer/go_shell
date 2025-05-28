@@ -43,7 +43,7 @@ func main() {
 			parts := strings.Fields(command)
 			if len(parts) > 1 {
 				cmdName := parts[1] // Get the command name to search for
-				
+
 				// Check if it's a builtin first
 				if cmdName == "echo" || cmdName == "exit" || cmdName == "type" {
 					fmt.Printf("%s is a shell builtin\n", cmdName)
@@ -59,7 +59,7 @@ func main() {
 			}
 			continue
 		}
-		
+
 		// Skip empty input
 		if command == "" {
 			continue
@@ -70,15 +70,17 @@ func main() {
 		if len(parts) > 0 {
 			cmdName := parts[0]
 			args := parts[1:] // Get arguments (everything after the command name)
-			
+
 			// Find the command in PATH
 			cmdPath := findInPath(cmdName)
 			if cmdPath != "" {
 				// Execute the external program
-				cmd := exec.Command(cmdPath, args...)
+				// Create arguments array with command name as first argument
+				allArgs := append([]string{cmdName}, args...)
+				cmd := exec.Command(cmdPath, allArgs...)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
-				
+
 				err := cmd.Run()
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error executing %s: %v\n", cmdName, err)
@@ -107,10 +109,10 @@ func findInPath(cmdName string) string {
 		if dir == "" {
 			continue
 		}
-		
+
 		// Create the full path to the potential executable
 		fullPath := filepath.Join(dir, cmdName)
-		
+
 		// Check if the file exists and is executable
 		if fileInfo, err := os.Stat(fullPath); err == nil {
 			// Check if it's a regular file and executable
@@ -119,6 +121,6 @@ func findInPath(cmdName string) string {
 			}
 		}
 	}
-	
+
 	return "" // Not found
 }
