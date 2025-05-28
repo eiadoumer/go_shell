@@ -76,8 +76,7 @@ func main() {
 			if cmdPath != "" {
 				// Execute the external program
 				// Create arguments array with command name as first argument
-				allArgs := append([]string{cmdName}, args...)
-				cmd := exec.Command(cmdPath, allArgs...)
+				cmd := exec.Command(cmdPath, args...)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 
