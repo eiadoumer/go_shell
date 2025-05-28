@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -42,7 +43,7 @@ func main() {
 			parts := strings.Fields(command)
 			if len(parts) > 1 {
 				cmdName := parts[1] // Get the command name to search for
-
+				
 				// Check if it's a builtin first
 				if cmdName == "echo" || cmdName == "exit" || cmdName == "type" {
 					fmt.Printf("%s is a shell builtin\n", cmdName)
@@ -58,13 +59,35 @@ func main() {
 			}
 			continue
 		}
+		
 		// Skip empty input
 		if command == "" {
 			continue
 		}
 
-		// Print command not found
-		fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+		// Try to execute as external program
+		parts := strings.Fields(command)
+		if len(parts) > 0 {
+			cmdName := parts[0]
+			args := parts[1:] // Get arguments (everything after the command name)
+			
+			// Find the command in PATH
+			cmdPath := findInPath(cmdName)
+			if cmdPath != "" {
+				// Execute the external program
+				cmd := exec.Command(cmdPath, args...)
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				
+				err := cmd.Run()
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error executing %s: %v\n", cmdName, err)
+				}
+			} else {
+				// Print command not found
+				fmt.Fprintf(os.Stdout, "%s: command not found\n", cmdName)
+			}
+		}
 	}
 }
 
@@ -77,17 +100,17 @@ func findInPath(cmdName string) string {
 	}
 
 	// Split PATH by colons to get individual directories
-	pathDirs := strings.SplitSeq(pathEnv, ":")
+	pathDirs := strings.Split(pathEnv, ":")
 
 	// Search each directory in order
-	for dir := range pathDirs {
+	for _, dir := range pathDirs {
 		if dir == "" {
 			continue
 		}
-
+		
 		// Create the full path to the potential executable
 		fullPath := filepath.Join(dir, cmdName)
-
+		
 		// Check if the file exists and is executable
 		if fileInfo, err := os.Stat(fullPath); err == nil {
 			// Check if it's a regular file and executable
@@ -96,6 +119,6 @@ func findInPath(cmdName string) string {
 			}
 		}
 	}
-
+	
 	return "" // Not found
 }
