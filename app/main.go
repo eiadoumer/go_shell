@@ -37,6 +37,20 @@ func main() {
 			}
 			continue
 		}
+		if strings.HasPrefix(command, "type") {
+			parts := strings.Fields(command)
+			if len(parts) > 1 {
+				if parts[len(parts)-1] == "echo" || parts[len(parts)-1] == "exit" || parts[len(parts)-1] == "type" {
+					fmt.Printf("%s: is a shell builtin\n", parts[len(parts)-1])
+
+				} else {
+					fmt.Printf("%s: not found\n", parts[len(parts)-1])
+				}
+			} else {
+				fmt.Println(" ")
+			}
+			continue
+		}
 		// Skip empty input
 		if command == "" {
 			continue
